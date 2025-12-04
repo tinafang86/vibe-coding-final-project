@@ -1,0 +1,664 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>我的食物清單</title>
+    <link href="https://fonts.googleapis.com/css2?family=Varela+Round&family=Noto+Sans+TC:wght@400;700&display=swap"
+        rel="stylesheet">
+    <!--  放入這三行開始 -->
+    <link rel="icon" type="image/png" href="./icon.png">
+    <link rel="apple-touch-icon" href="./icon.png">
+    <link rel="apple-touch-icon" sizes="180x180" href="./icon.png">
+    <!--  放入這三行結束 -->
+    <style>
+        /* CSS 樣式：摩爾莊園風格 V2.1 (單欄表單，不破行，細節加強) */
+        :root {
+            --mola-green-light: #F4FEE4;
+            --mola-green-dark: #4CAF50;
+            --mola-brown: #8D6E63;
+            --mola-wood-light: #FFFAE6;
+            --mola-soil: #5D4037;
+            --mola-alert-low: #FFC107;
+            --mola-alert-danger: #E53935;
+            --mola-font-main: 'Varela Round', 'Noto Sans TC', sans-serif;
+            --mola-font-normal: 'Noto Sans TC', sans-serif;
+        }
+
+        body {
+            background-color: var(--mola-green-light);
+            font-family: var(--mola-font-normal);
+            color: var(--mola-soil);
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-height: 100vh;
+            overflow-x: hidden;
+            position: relative;
+            background-image: linear-gradient(to bottom, #E0F2B0 0%, #F4FEE4 100%);
+        }
+
+        .mola-main-barn {
+            width: 100%;
+            max-width: 750px;
+            background-color: var(--mola-wood-light);
+            border: 6px solid var(--mola-brown);
+            border-radius: 25px;
+            padding: 30px;
+            box-shadow: 8px 8px 0px rgba(0, 0, 0, 0.3), inset 0 0 10px rgba(0, 0, 0, 0.1);
+            position: relative;
+            transition: transform 0.3s;
+        }
+
+        h1,
+        h2,
+        #mola-list-title,
+        #mola-history-title {
+            font-family: var(--mola-font-main);
+            color: var(--mola-green-dark);
+            text-align: center;
+            font-weight: 700;
+            text-shadow: 2px 2px 0px var(--mola-wood-light), 4px 4px 0px rgba(0, 0, 0, 0.1);
+            position: relative;
+            z-index: 10;
+        }
+
+        h1 {
+            font-size: 3em;
+            letter-spacing: 2px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 15px;
+            border-bottom: 4px dashed var(--mola-brown);
+            padding-bottom: 15px;
+            margin-bottom: 25px;
+            margin-top: 0;
+        }
+
+        h1::before {
+            content: "🌰";
+            font-size: 1.2em;
+            animation: bounce 1s infinite alternate;
+        }
+
+        @keyframes bounce {
+            from {
+                transform: translateY(0);
+            }
+
+            to {
+                transform: translateY(-5px);
+            }
+        }
+
+        h2 {
+            font-size: 1.8em;
+            text-align: left;
+            padding-left: 15px;
+            color: var(--mola-brown);
+            text-shadow: 1px 1px 0px rgba(255, 255, 255, 0.7);
+            margin-bottom: 15px;
+        }
+
+        h2::before {
+            content: "🌱 ";
+        }
+
+        #mola-list-title {
+            font-size: 2em;
+            text-align: left;
+            margin-top: 40px;
+            margin-bottom: 25px;
+            justify-content: flex-start;
+        }
+
+        #mola-list-title::before {
+            content: "🧺";
+            margin-right: 10px;
+        }
+
+        #mola-history-title {
+            font-size: 1.8em;
+            color: var(--mola-soil);
+            border-top: 2px dashed var(--mola-brown);
+            padding-top: 20px;
+            margin-top: 40px;
+            margin-bottom: 20px;
+            text-shadow: none;
+        }
+
+        #mola-history-title::before {
+            content: "📜";
+            margin-right: 10px;
+        }
+
+        /* 表單區塊 */
+        /* === 核心修改：從 1fr 2fr 改為 1fr，讓每個項目佔滿一行 === */
+        #mola-form-seedbox {
+            display: grid;
+            grid-template-columns: 1fr;
+            /* 單欄佈局 */
+            gap: 15px;
+            padding: 25px;
+            margin-bottom: 30px;
+            border: 4px double var(--mola-green-dark);
+            border-radius: 15px;
+            background-color: #E8F5E9;
+            box-shadow: inset 0 0 8px rgba(0, 0, 0, 0.1);
+        }
+
+        /* .form-group 不需要特別設置 grid-column 了，因為它預設就會佔滿單欄 */
+        .full-width {
+            grid-column: 1 / -1;
+            text-align: center;
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* 讓 label 和 input 垂直排列 */
+        .form-group label {
+            font-family: var(--mola-font-main);
+            font-size: 1.1em;
+            color: var(--mola-brown);
+            font-weight: 700;
+            margin-bottom: 5px;
+        }
+
+        input[type="text"],
+        input[type="date"],
+        input[type="number"],
+        select {
+            border: 2px solid var(--mola-brown);
+            border-radius: 8px;
+            padding: 10px;
+            font-family: var(--mola-font-normal);
+            background-color: var(--mola-wood-light);
+            transition: border-color 0.2s;
+            width: 100%;
+            box-sizing: border-box;
+        }
+
+        input:focus,
+        select:focus {
+            outline: none;
+            border-color: var(--mola-green-dark);
+            box-shadow: 0 0 5px rgba(76, 175, 80, 0.5);
+        }
+
+        button[type="submit"] {
+            font-family: var(--mola-font-main);
+            background-color: var(--mola-green-dark);
+            color: var(--mola-wood-light);
+            border: 3px solid var(--mola-brown);
+            border-radius: 30px;
+            padding: 12px 30px;
+            font-size: 1.2em;
+            cursor: pointer;
+            box-shadow: 3px 3px 0px rgba(0, 0, 0, 0.3);
+            transition: all 0.1s;
+            margin-top: 10px;
+        }
+
+        button[type="submit"]:hover {
+            background-color: #81C784;
+            box-shadow: 1px 1px 0px rgba(0, 0, 0, 0.3);
+            transform: translateY(2px) translateX(2px);
+        }
+
+        .filter-section {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            margin-bottom: 20px;
+            padding: 10px 15px;
+            background-color: rgba(255, 255, 255, 0.7);
+            border-radius: 10px;
+            border: 1px dashed #BDBDBD;
+        }
+
+        .filter-section label {
+            font-family: var(--mola-font-main);
+            color: var(--mola-soil);
+            font-weight: 700;
+        }
+
+        /* 清單樣式 (維持不變，因為清單佈局沒有改變) */
+        #mola-list-harvest,
+        #mola-list-history {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+            width: 100%;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .mola-item-produce {
+            display: grid;
+            grid-template-columns: 3fr 1fr auto;
+            align-items: center;
+            gap: 15px;
+            padding: 15px 20px;
+            border-radius: 15px;
+            border: 2px solid var(--mola-green-dark);
+            background-color: var(--mola-wood-light);
+            box-shadow: 2px 2px 0px rgba(0, 0, 0, 0.1);
+            position: relative;
+        }
+
+        .mola-item-details {
+            display: flex;
+            flex-direction: column;
+            text-align: left;
+        }
+
+        .mola-item-name {
+            font-family: var(--mola-font-main);
+            font-size: 1.4em;
+            color: var(--mola-green-dark);
+            font-weight: 700;
+            margin-bottom: 3px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        /* 防止名稱過長破行 */
+        .mola-item-dates {
+            font-size: 0.9em;
+            color: var(--mola-soil);
+            line-height: 1.5;
+        }
+
+        .mola-item-days-left {
+            font-family: var(--mola-font-main);
+            padding: 8px 12px;
+            border-radius: 10px;
+            text-align: center;
+            min-width: 110px;
+            font-size: 1.1em;
+            font-weight: bold;
+            line-height: 1.2;
+        }
+
+        .mola-delete-btn {
+            background-color: var(--mola-alert-danger);
+            color: white;
+            border: none;
+            border-radius: 50%;
+            width: 35px;
+            height: 35px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            font-size: 1em;
+            line-height: 1;
+            box-shadow: 2px 2px 0px rgba(0, 0, 0, 0.3);
+            transition: transform 0.1s;
+        }
+
+        .mola-delete-btn:hover {
+            background-color: #C62828;
+            transform: scale(1.05);
+        }
+
+        /* 狀態顏色加強 */
+        .status-safe {
+            background-color: #E6F7DF;
+            color: #1B5E20;
+            border-color: #A5D6A7;
+            box-shadow: inset 0 0 5px #81C784;
+        }
+
+        .status-safe::before {
+            content: "🌱";
+        }
+
+        .status-low {
+            background-color: var(--mola-alert-low);
+            color: #FF6F00;
+            border-color: #FFD54F;
+            animation: pulse-yellow 1s infinite alternate;
+            box-shadow: 0 0 8px var(--mola-alert-low);
+        }
+
+        .status-low::before {
+            content: "🔔";
+        }
+
+        .status-danger {
+            background-color: var(--mola-alert-danger);
+            color: var(--mola-wood-light);
+            border-color: #D32F2F;
+            animation: pulse-red 0.5s infinite;
+            box-shadow: 0 0 10px var(--mola-alert-danger);
+        }
+
+        .status-danger::before {
+            content: "🚨";
+        }
+
+        /* 歷史資料專屬樣式 */
+        .status-expired {
+            background-color: #E0E0E0;
+            color: #757575;
+            border-color: #BDBDBD;
+            font-style: normal;
+            opacity: 0.7;
+            text-decoration: line-through;
+        }
+
+        .status-expired .mola-delete-btn {
+            background-color: #9E9E9E;
+        }
+
+        .status-expired .mola-delete-btn:hover {
+            background-color: #757575;
+        }
+
+        .status-expired::before {
+            content: "🗑️";
+        }
+
+        @keyframes pulse-yellow {
+            from {
+                transform: scale(1);
+            }
+
+            to {
+                transform: scale(1.02);
+                box-shadow: 0 0 10px 0px var(--mola-alert-low);
+            }
+        }
+
+        @keyframes pulse-red {
+            from {
+                transform: scale(1);
+                opacity: 1;
+            }
+
+            to {
+                transform: scale(1.03);
+                opacity: 0.8;
+            }
+        }
+
+        /* RWD 調整 */
+        @media (max-width: 600px) {
+            .mola-item-produce {
+                grid-template-columns: 1fr auto;
+                gap: 10px;
+                grid-template-areas: "details daysleft" "details deletebtn";
+            }
+
+            .mola-item-details {
+                grid-area: details;
+            }
+
+            .mola-item-days-left {
+                grid-area: daysleft;
+                min-width: unset;
+            }
+
+            .mola-delete-btn {
+                grid-area: deletebtn;
+                justify-self: end;
+            }
+
+            .mola-item-name {
+                font-size: 1.2em;
+            }
+
+            .mola-item-dates {
+                font-size: 0.8em;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="mola-main-barn">
+        <h1>🌰 伙食倉庫 🧺</h1>
+
+        <form id="mola-form-seedbox">
+            <h2>🌱 我的食物</h2>
+            <div class="form-group">
+                <label for="category">食物類別</label>
+                <select id="category">
+                    <option value="水果">🍎 水果</option>
+                    <option value="蔬菜">🥦 蔬菜</option>
+                    <option value="麥子">🌾 麥子</option>
+                    <option value="漁獲">🎣 漁獲</option>
+                    <option value="點心">🍰 點心</option>
+                    <option value="飲品">🥤 飲品</option>
+                    <option value="漿果">🟣 漿果</option>
+                    <option value="加工品">🧪 加工品</option>
+                    <option value="調味">🧂 調味</option>
+                    <option value="其他">❓ 其他</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label for="name">名稱</label>
+                <input type="text" id="name" required placeholder="例如：神奇南瓜">
+            </div>
+            <div class="form-group">
+                <label for="purchaseDate">購買日期</label>
+                <input type="date" id="purchaseDate" required>
+            </div>
+            <div class="form-group">
+                <label for="expiryDate">保存期限</label>
+                <input type="date" id="expiryDate" required>
+            </div>
+            <div class="form-group">
+                <label for="quantity">數量</label>
+                <input type="number" id="quantity" min="1" value="1" required>
+            </div>
+            <div class="full-width">
+                <button type="submit">📦 登記庫存</button>
+            </div>
+        </form>
+
+        <h2 id="mola-list-title">🧺 庫存清單</h2>
+
+        <div class="filter-section">
+            <label for="category-filter">類別篩選</label>
+            <select id="category-filter">
+                <option value="all">所有類別</option>
+                <option value="水果">🍎 水果</option>
+                <option value="蔬菜">🥦 蔬菜</option>
+                <option value="餅乾">🍪 餅乾</option>
+                <option value="生鮮">🎣 生鮮</option>
+                <option value="點心">🍰 點心</option>
+                <option value="乳/飲料">🥤 乳/飲料</option>
+                <option value="泡麵">🍝 泡麵</option>
+                <option value="藥">💊 藥</option>
+                <option value="調味">🧂 調味</option>
+                <option value="其他">❓ 其他</option>
+            </select>
+        </div>
+
+        <ul id="mola-list-harvest">
+            <li
+                style="text-align: center; color: var(--mola-soil); font-family: var(--mola-font-normal); font-weight: 700; padding: 20px;">
+                目前倉庫沒有任何作物，快去採集吧！
+            </li>
+        </ul>
+
+        <h2 id="mola-history-title" style="display: none;">📜 歷史資料 (已過期)</h2>
+        <ul id="mola-list-history">
+        </ul>
+
+    </div>
+
+    <script>
+        const molaFormSeedbox = document.getElementById('mola-form-seedbox');
+        const molaListHarvest = document.getElementById('mola-list-harvest');
+        const molaListHistory = document.getElementById('mola-list-history');
+        const molaHistoryTitle = document.getElementById('mola-history-title');
+        const purchaseDateInput = document.getElementById('purchaseDate');
+        const categoryFilter = document.getElementById('category-filter');
+
+        function setTodayDate() {
+            const today = new Date();
+            const yyyy = today.getFullYear();
+            const mm = String(today.getMonth() + 1).padStart(2, '0');
+            const dd = String(today.getDate()).padStart(2, '0');
+            const todayString = `${yyyy}-${mm}-${dd}`;
+            purchaseDateInput.value = todayString;
+            purchaseDateInput.max = todayString;
+        }
+        setTodayDate();
+
+        let foods = JSON.parse(localStorage.getItem('foods')) || [];
+
+        function calculateDaysLeft(expiryDate) {
+            const today = new Date();
+            today.setHours(0, 0, 0, 0);
+            const expiry = new Date(expiryDate);
+            expiry.setHours(0, 0, 0, 0);
+            const differenceMs = expiry.getTime() - today.getTime();
+            return Math.ceil(differenceMs / (1000 * 60 * 60 * 24));
+        }
+
+        function renderFoodItem(food, index) {
+            const daysLeft = calculateDaysLeft(food.expiryDate);
+            let statusClass = 'status-safe';
+            let statusText = `${daysLeft} 天後變質`;
+
+            if (daysLeft < 0) {
+                statusClass = 'status-expired';
+                statusText = `已過期 ${Math.abs(daysLeft)} 天`;
+            } else if (daysLeft < 3) {
+                statusClass = 'status-danger';
+                statusText = `快壞了！剩 ${daysLeft} 天！`;
+            } else if (daysLeft < 7) {
+                statusClass = 'status-low';
+                statusText = `剩 ${daysLeft} 天`;
+            }
+
+            const formatDate = (dateString) => new Date(dateString).toLocaleDateString('zh-TW', { month: 'numeric', day: 'numeric' });
+
+            const listItem = document.createElement('li');
+            listItem.className = 'mola-item-produce';
+
+            listItem.innerHTML = `
+                <div class="mola-item-details">
+                    <div class="mola-item-name">${food.name} (x${food.quantity})</div>
+                    <div class="mola-item-dates">
+                        <span>購買日期: ${formatDate(food.purchaseDate)}</span> -------- <span>到期日: ${formatDate(food.expiryDate)}</span>
+                    </div>
+                </div>
+                <div class="mola-item-days-left ${statusClass}">
+                    ${statusText}
+                </div>
+                <button class="mola-delete-btn" data-index="${index}">X</button> 
+            `;
+
+            // 根據 daysLeft 決定項目要放入哪個清單
+            if (daysLeft < 0) {
+                molaListHistory.appendChild(listItem);
+            } else {
+                molaListHarvest.appendChild(listItem);
+            }
+        }
+
+        function renderFoodList() {
+            const selectedCategory = categoryFilter.value;
+            const filteredFoods = foods.filter(food => {
+                return selectedCategory === 'all' || food.category === selectedCategory;
+            });
+
+            // 分離正常庫存和過期資料
+            const currentFoods = filteredFoods.filter(food => calculateDaysLeft(food.expiryDate) >= 0);
+            const expiredFoods = filteredFoods.filter(food => calculateDaysLeft(food.expiryDate) < 0);
+
+            // 排序：天數少的排在前面
+            currentFoods.sort((a, b) => calculateDaysLeft(a.expiryDate) - calculateDaysLeft(b.expiryDate));
+            // 歷史資料按過期天數排序
+            expiredFoods.sort((a, b) => calculateDaysLeft(a.expiryDate) - calculateDaysLeft(b.expiryDate));
+
+            molaListHarvest.innerHTML = '';
+            molaListHistory.innerHTML = '';
+
+            // 渲染正常庫存
+            if (currentFoods.length === 0) {
+                molaListHarvest.innerHTML = `<li style="text-align: center; color: var(--mola-soil); font-family: var(--mola-font-normal); font-weight: 700; padding: 20px;">
+                                                  ${selectedCategory === 'all' ? '目前的倉庫清單是空的喔！' : `「${selectedCategory.replace(/[^一-龠A-Za-z]/g, '')}」類別中沒有未過期作物。`}
+                                               </li>`;
+            } else {
+                currentFoods.forEach(food => {
+                    const originalIndex = foods.findIndex(item => item.name === food.name && item.expiryDate === food.expiryDate && item.purchaseDate === food.purchaseDate);
+                    renderFoodItem(food, originalIndex);
+                });
+            }
+
+            // 渲染歷史資料
+            if (expiredFoods.length > 0) {
+                molaHistoryTitle.style.display = 'flex';
+                expiredFoods.forEach(food => {
+                    const originalIndex = foods.findIndex(item => item.name === food.name && item.expiryDate === food.expiryDate && item.purchaseDate === food.purchaseDate);
+                    renderFoodItem(food, originalIndex);
+                });
+            } else {
+                molaHistoryTitle.style.display = 'none';
+            }
+
+            document.querySelectorAll('.mola-delete-btn').forEach(button => {
+                button.addEventListener('click', deleteFood);
+            });
+        }
+
+        function saveFoods() {
+            localStorage.setItem('foods', JSON.stringify(foods));
+        }
+
+        function addFood(event) {
+            event.preventDefault();
+            const category = document.getElementById('category').value;
+            const name = document.getElementById('name').value.trim();
+            const purchaseDate = document.getElementById('purchaseDate').value;
+            const expiryDate = document.getElementById('expiryDate').value;
+            const quantity = parseInt(document.getElementById('quantity').value);
+
+            if (!name || !expiryDate || quantity <= 0) {
+                alert('請確認所有欄位都已正確填寫，摩爾不能偷懶喔！');
+                return;
+            }
+
+            const newFood = { category, name, purchaseDate, expiryDate, quantity };
+            foods.push(newFood);
+            saveFoods();
+            renderFoodList();
+
+            document.getElementById('name').value = '';
+            document.getElementById('expiryDate').value = '';
+            setTodayDate();
+            document.getElementById('quantity').value = 1;
+        }
+
+        function deleteFood(event) {
+            const index = event.target.dataset.index;
+            if (confirm(`確定要將 ${foods[index].name} 從倉庫刪除嗎？這很可惜！`)) {
+                foods.splice(index, 1);
+                saveFoods();
+                renderFoodList();
+            }
+        }
+
+        molaFormSeedbox.addEventListener('submit', addFood);
+        categoryFilter.addEventListener('change', renderFoodList);
+        renderFoodList();
+
+    </script>
+</body>
+
+</html>
