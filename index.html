@@ -7,11 +7,9 @@
     <title>我的食物清單</title>
     <link href="https://fonts.googleapis.com/css2?family=Varela+Round&family=Noto+Sans+TC:wght@400;700&display=swap"
         rel="stylesheet">
-    <!--  放入這三行開始 -->
     <link rel="icon" type="image/png" href="./icon.png">
     <link rel="apple-touch-icon" href="./icon.png">
     <link rel="apple-touch-icon" sizes="180x180" href="./icon.png">
-    <!--  放入這三行結束 -->
     <style>
         /* CSS 樣式：摩爾莊園風格 V2.1 (單欄表單，不破行，細節加強) */
         :root {
@@ -394,6 +392,41 @@
 
         /* RWD 調整 */
         @media (max-width: 600px) {
+
+            /* 【導師新增/修改】手機版選單優化：確保字體夠大、欄高一致 */
+            input[type="text"],
+            input[type="date"],
+            input[type="number"],
+            select {
+                font-size: 1.1em;
+                /* 增大字體 */
+                padding: 12px 10px;
+                /* 增大上下內邊距，增加高度 */
+                min-height: 45px;
+                /* 確保最小高度 */
+            }
+
+            /* 針對 Select 選單調整 */
+            select {
+                appearance: none;
+                /* 移除瀏覽器預設樣式 */
+                -webkit-appearance: none;
+                -moz-appearance: none;
+                /* 自訂一個向下箭頭圖示 */
+                background-image: url('data:image/svg+xml;charset=US-ASCII,<svg xmlns="http://www.w3.org/2000/svg" width="292.4" height="292.4" fill="%238D6E63"><path d="M287 64.8L146.2 205.7 5.4 64.8z"/></svg>');
+                background-repeat: no-repeat;
+                background-position: right 10px top 50%;
+                background-size: 10px auto;
+            }
+
+            .filter-section select {
+                /* 針對篩選區塊的選單調整，避免箭頭被文字擋住 */
+                padding: 8px 30px 8px 10px;
+            }
+
+            /* 【導師新增/修改】手機版選單優化 結束 */
+
+            /* 原有的 RWD 列表佈局保持不變 */
             .mola-item-produce {
                 grid-template-columns: 1fr auto;
                 gap: 10px;
@@ -427,7 +460,7 @@
 
 <body>
     <div class="mola-main-barn">
-        <h1>🌰 伙食倉庫 🧺</h1>
+        <h1>🌰伙食倉庫 🧺</h1>
 
         <form id="mola-form-seedbox">
             <h2>🌱 我的食物</h2>
@@ -436,12 +469,12 @@
                 <select id="category">
                     <option value="水果">🍎 水果</option>
                     <option value="蔬菜">🥦 蔬菜</option>
-                    <option value="麥子">🌾 麥子</option>
-                    <option value="漁獲">🎣 漁獲</option>
+                    <option value="糖果餅乾">🍪 糖果餅乾</option>
+                    <option value="海鮮">🐟 海鮮</option>
                     <option value="點心">🍰 點心</option>
                     <option value="飲品">🥤 飲品</option>
-                    <option value="漿果">🟣 漿果</option>
-                    <option value="加工品">🧪 加工品</option>
+                    <option value="乳製品">🥛 乳製品</option>
+                    <option value="乾貨">🫙 乾貨</option>
                     <option value="調味">🧂 調味</option>
                     <option value="其他">❓ 其他</option>
                 </select>
